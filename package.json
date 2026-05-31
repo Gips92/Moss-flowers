@@ -1,0 +1,17 @@
+{
+  "name": "floral-viz",
+  "version": "1.0.0",
+  "description": "Внутренний инструмент: вставка цветочной композиции в интерьер клиента через Nano Banana 2 (Gemini 3.1 Flash Image).",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
