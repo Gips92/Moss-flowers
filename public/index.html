@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>MOSS · цветы в интерьере</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#ffffff;
+    --soft:#f7f7f7;
+    --paper:#ffffff;
+    --ink:#000000;
+    --muted:#757575;
+    --line:#ebebeb;
+    --leaf:#9ab025;
+    --leaf-d:#869a1f;
+    --warm:#ff7935;
+    --danger:#ff4a4a;
+    --marker:#ff2da6;
+    --radius:18px;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 10px 30px rgba(0,0,0,.05);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"Manrope",system-ui,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 28px);
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 18px}
+
+  header{padding:30px 0 12px;text-align:center}
+  .logo{height:34px;width:auto;display:inline-block}
+  header .kicker{
+    margin-top:14px;font-size:11px;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--leaf);font-weight:700;
+  }
+  header h1{
+    font-weight:800;font-size:clamp(26px,6.4vw,36px);
+    margin:.12em 0 .14em;line-height:1.05;letter-spacing:-.02em;
+  }
+  header p{color:var(--muted);margin:0;font-size:14px}
+  .balance{
+    display:inline-flex;align-items:center;gap:7px;margin-top:12px;
+    font-size:12px;font-weight:600;color:var(--muted);
+    background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:5px 12px;
+  }
+  .balance .dot{width:7px;height:7px;border-radius:50%;background:var(--leaf);flex:0 0 auto}
+  .balance.low{color:#9a5a12;background:#fff6ec;border-color:#ffd8a8}
+  .balance.low .dot{background:var(--warm)}
+  .balance.empty{color:#b8401d;background:#fff1ef;border-color:#ffd0c5}
+  .balance.empty .dot{background:var(--danger)}
+
+  .step{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:18px;margin:18px 0;
+  }
+  .step-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .num{
+    flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+    background:var(--leaf);color:#fff;font-size:13px;font-weight:800;
+    display:grid;place-items:center;
+  }
+  .step-head h2{font-weight:700;font-size:18px;margin:0;letter-spacing:-.01em}
+  .hint{color:var(--muted);font-size:13px;margin:-6px 0 12px}
+
+  .uploads{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:430px){.uploads{grid-template-columns:1fr}}
+  .tile{
+    position:relative;border:1.5px dashed var(--line);border-radius:14px;
+    aspect-ratio:4/3;display:grid;place-items:center;text-align:center;
+    cursor:pointer;overflow:hidden;background:var(--soft);transition:border-color .2s,transform .1s;
+  }
+  .tile:active{transform:scale(.99)}
+  .tile.has{border-style:solid;border-color:var(--leaf)}
+  .tile input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .tile .ph{padding:14px;color:var(--muted);font-size:13px;pointer-events:none}
+  .tile .ph b{display:block;color:var(--ink);font-weight:700;font-size:14px;margin-top:4px}
+  .tile .ph .ico{font-size:24px}
+  .tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .tile .badge{
+    position:absolute;left:8px;top:8px;background:var(--leaf);color:#fff;
+    font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.03em;
+  }
+
+  .stage-card{display:none}
+  .stage-card.show{display:block}
+  .stage{position:relative;touch-action:none;border-radius:12px;overflow:hidden;
+    background:#000;user-select:none;-webkit-user-select:none;line-height:0}
+  .stage img{width:100%;height:auto;display:block;pointer-events:none}
+  .marker{
+    position:absolute;transform:translate(-50%,-50%);border-radius:50%;
+    border:3px solid var(--marker);
+    background:radial-gradient(circle,rgba(255,45,166,.10),rgba(255,45,166,.18));
+    box-shadow:0 0 0 1px rgba(255,255,255,.6), 0 6px 16px rgba(255,45,166,.35);
+    pointer-events:none;
+  }
+  .marker::before,.marker::after{content:"";position:absolute;background:var(--marker);left:50%;top:50%}
+  .marker::before{width:2px;height:34%;transform:translate(-50%,-50%)}
+  .marker::after{height:2px;width:34%;transform:translate(-50%,-50%)}
+  .slider-row{display:flex;align-items:center;gap:12px;margin-top:14px}
+  .slider-row label{font-size:13px;color:var(--muted);white-space:nowrap;font-weight:600}
+  input[type=range]{flex:1;accent-color:var(--leaf);height:28px}
+
+  textarea{
+    width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+    font-family:inherit;font-size:15px;color:var(--ink);background:#fff;resize:vertical;min-height:84px;
+  }
+  textarea:focus{outline:none;border-color:var(--leaf);box-shadow:0 0 0 3px rgba(154,176,37,.15)}
+
+  .go{
+    width:100%;border:none;border-radius:999px;cursor:pointer;
+    background:var(--leaf);color:#fff;font-family:inherit;
+    font-size:16px;font-weight:700;letter-spacing:.01em;padding:16px;
+    box-shadow:0 8px 18px rgba(154,176,37,.30);transition:transform .1s,opacity .2s,background .2s;
+  }
+  .go:hover{background:var(--leaf-d)}
+  .go:active{transform:translateY(1px)}
+  .go:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+
+  #result{margin-top:22px}
+  .loading{display:flex;align-items:center;gap:14px;color:var(--muted);
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .spinner{width:24px;height:24px;border-radius:50%;
+    border:3px solid var(--line);border-top-color:var(--leaf);animation:spin 1s linear infinite;flex:0 0 auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .result-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden}
+  .result-card img{width:100%;display:block}
+  .result-actions{display:flex;gap:10px;padding:14px}
+  .btn-ghost{flex:1;text-align:center;text-decoration:none;border:1px solid var(--line);
+    background:#fff;color:var(--ink);border-radius:999px;padding:12px;font-weight:700;font-size:14px;
+    cursor:pointer;font-family:inherit;transition:border-color .2s}
+  .btn-ghost:hover{border-color:var(--leaf)}
+  .btn-ghost:active{transform:translateY(1px)}
+  .err{background:#fff1ef;border:1px solid #ffd0c5;color:#b8401d;border-radius:var(--radius);padding:16px;font-size:14px}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:26px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 35" fill="none" role="img" aria-label="MOSS"><g clip-path="url(#mossclip)"><path d="M0.677391 34.6749H11.2471C11.2471 34.6749 8.72588 32.2477 7.07739 24.322C5.42891 16.3963 3.48951 5.59752 6.738 4.4582C9.98648 3.31888 14.3016 27.3932 14.3016 27.3932C14.3016 27.3932 17.7441 40.2229 20.8471 30.613C23.7562 21.6471 24.9683 13.4737 26.2289 9.60991C27.6835 5.20124 30.7865 1.387 31.3683 8.66873C31.9501 15.9505 28.4592 31.7523 24.8228 34.6749H36.5562C34.7622 31.8514 31.9016 23.1331 33.0168 13.1269C33.5016 8.66873 33.2592 8.7678 35.1986 1.68421C35.1986 1.68421 30.2047 1.23839 28.2653 1.98142C26.3259 2.72446 24.338 8.42105 24.338 8.42105C24.338 8.42105 23.1744 13.1269 22.5925 15.6037C21.5259 19.9628 20.0713 33.5356 16.9683 23.1331C13.8653 12.7306 13.8168 2.08049 9.06527 1.83282C7.41679 1.73375 1.01679 1.68421 1.01679 1.68421C2.95618 7.2322 3.58648 8.81734 4.11982 17.7833C4.26527 28.9783 0.628906 34.6749 0.628906 34.6749H0.677391Z" fill="#9AB025"></path><path d="M49.889 1.13932C41.6466 1.13932 34.9557 8.71827 35.0042 18.0805C35.0042 27.4427 41.6951 35.0217 49.9375 35.0217C58.1799 35.0217 64.8708 27.4427 64.8224 18.0805C64.8224 8.71827 58.1314 1.13932 49.889 1.13932ZM55.1739 32.5449C49.5011 34.7245 42.5678 29.969 39.6587 21.9938C36.7496 14.0186 38.9799 5.79566 44.6527 3.6161C50.3254 1.43653 57.2587 6.19195 60.1678 14.1672C63.0769 22.1424 60.8466 30.3653 55.1739 32.5449Z" fill="#9AB025" stroke="#9AB025" stroke-miterlimit="10"></path><path d="M49.4543 15.7028C49.0179 11.3437 53.624 9.75851 54.8846 11.9876C56.1452 14.2167 54.2543 14.5635 51.6361 17.1889C51.6361 17.1889 53.7694 14.9598 55.6119 15.6037C57.4543 16.2477 58.327 19.2694 57.0664 20.5077C55.8058 21.7461 52.121 18.6749 52.121 18.6749C52.121 18.6749 53.0422 20.7554 53.1391 22.5882C53.1391 24.3715 52.4119 25.6594 50.8119 25.5108C49.2119 25.3622 48.2422 24.5201 48.5816 22.7368C48.921 20.9536 49.4543 20.4087 49.4543 20.4087C49.4543 20.4087 47.5634 22.2415 45.0422 22.2415C42.521 22.2415 42.5694 20.161 42.9088 19.2198C43.7816 16.6935 46.6907 18.2786 46.6907 18.2786C46.6907 18.2786 45.527 16.9907 45.0907 16.3467C44.6543 15.7028 43.4422 13.6223 45.3816 12.4334C47.321 11.2446 48.2422 13.226 48.5331 13.5232C48.824 13.8204 49.5028 15.6037 49.5028 15.6037V15.7028H49.4543Z" fill="#FF7935"></path><path d="M89.5989 0.743034C89.5989 0.743034 94.4474 6.78638 88.0474 10.3529C81.6474 13.9195 78.205 8.12384 77.2353 7.47988C76.2656 6.83591 71.2717 4.01238 70.0596 6.88545C68.8474 9.75851 75.0535 11.8885 76.8959 12.3344C80.7262 13.2755 85.8656 15.356 88.2414 16.644C93.5262 19.5666 92.9929 28.5325 87.902 32.0991C78.1565 38.935 66.1323 33.0898 66.3747 24.5697C66.5202 18.4272 70.5444 16.4954 70.5444 16.4954C77.0899 13.4241 80.2414 17.5356 80.6293 17.9814C81.0171 18.4272 82.1808 20.2601 82.1323 22.4396C82.0838 26.4025 78.8838 28.2848 78.8838 28.2848C78.8838 28.2848 77.2838 24.322 73.5989 23.7276C73.4535 23.7276 70.6899 22.9845 69.5747 26.2539C69.5747 26.2539 68.3626 29.7214 72.9202 31.7523C73.2595 31.9009 76.3141 33.2384 79.1747 31.6037C82.0353 29.969 82.8111 27.3932 83.2959 25.9071C83.7808 24.4211 84.3141 21.548 82.908 18.4768C81.502 15.4056 77.3808 14.2663 77.3808 14.2663C77.3808 14.2663 71.902 12.6811 70.4474 11.3932C68.9929 10.1053 68.0717 9.01548 68.4596 6.58824C68.8474 4.16099 69.8656 3.26935 71.3686 2.32817C72.8717 1.387 75.0535 1.5356 77.3808 1.73375C79.708 1.93189 80.3868 2.82353 83.9747 2.72446C87.5626 2.62539 89.6474 0.743034 89.6474 0.743034H89.5989Z" fill="#9AB025"></path><path d="M116.462 0.743034C116.462 0.743034 121.311 6.78638 114.911 10.3529C108.511 13.9195 105.068 8.12384 104.099 7.47988C103.129 6.83591 98.1349 4.01238 96.9228 6.88545C95.7107 9.75851 101.917 11.8885 103.759 12.3344C107.589 13.2755 112.729 15.356 115.105 16.644C120.389 19.5666 119.856 28.5325 114.765 32.0991C105.02 38.935 92.9956 33.0898 93.238 24.5697C93.3834 18.4272 97.4077 16.4954 97.4077 16.4954C103.953 13.4241 107.105 17.5356 107.493 17.9814C107.88 18.4272 109.044 20.2601 108.996 22.4396C108.947 26.4025 105.747 28.2848 105.747 28.2848C105.747 28.2848 104.147 24.322 100.462 23.7276C100.317 23.7276 97.5531 22.9845 96.438 26.2539C96.438 26.2539 95.2259 29.7214 99.7834 31.7523C100.123 31.9009 103.177 33.2384 106.038 31.6037C108.899 29.969 109.674 27.3932 110.159 25.9071C110.644 24.4211 111.177 21.548 109.771 18.4768C108.365 15.4056 104.244 14.2663 104.244 14.2663C104.244 14.2663 98.7653 12.6811 97.3107 11.3932C95.8562 10.1053 94.935 9.01548 95.3228 6.58824C95.7107 4.16099 96.7289 3.26935 98.2319 2.32817C99.735 1.387 101.917 1.5356 104.244 1.73375C106.571 1.93189 107.25 2.82353 110.838 2.72446C114.426 2.62539 116.511 0.743034 116.511 0.743034H116.462Z" fill="#9AB025"></path></g><defs><clipPath id="mossclip"><rect width="120" height="35" fill="white"></rect></clipPath></defs></svg>
+    <div class="kicker">B2B · визуализация</div>
+    <h1>Цветы в интерьере</h1>
+    <p>Загрузите интерьер и композицию, укажите место — получите фото.</p>
+    <div class="balance" id="balance" hidden><span class="dot"></span><span id="balanceText"></span></div>
+  </header>
+
+  <section class="step">
+    <div class="step-head"><span class="num">1</span><h2>Фотографии</h2></div>
+    <div class="uploads">
+      <label class="tile" id="tileInterior">
+        <input type="file" accept="image/*" id="fileInterior" />
+        <div class="ph"><div class="ico">🏠</div><b>Интерьер клиента</b>фото помещения</div>
+      </label>
+      <label class="tile" id="tileComposition">
+        <input type="file" accept="image/*" id="fileComposition" />
+        <div class="ph"><div class="ico">💐</div><b>Композиция</b>фото букета</div>
+      </label>
+    </div>
+  </section>
+
+  <section class="step stage-card" id="stageCard">
+    <div class="step-head"><span class="num">2</span><h2>Куда поставить</h2></div>
+    <p class="hint">Коснитесь интерьера в нужном месте. Точку можно перетаскивать, а размер круга подскажет модели масштаб композиции.</p>
+    <div class="stage" id="stage">
+      <img id="stageImg" alt="интерьер" />
+      <div class="marker" id="marker" style="display:none"></div>
+    </div>
+    <div class="slider-row">
+      <label>Размер</label>
+      <input type="range" id="size" min="8" max="60" value="26" />
+    </div>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><span class="num">3</span><h2>Пожелания</h2></div>
+    <p class="hint">Необязательно. Например: «поставь на консоль слева, добавь мягкую тень, тёплый вечерний свет».</p>
+    <textarea id="prefs" placeholder="Пожелания к визуализации…"></textarea>
+  </section>
+
+  <button class="go" id="go" disabled>Сгенерировать</button>
+
+  <div id="result"></div>
+
+  <footer>Внутренний инструмент MOSS · Nano Banana 2 (Gemini 3.1 Flash Image)</footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const state = {
+  interior: { img:null, natW:0, natH:0, dataUrl:null },
+  composition: { img:null, dataUrl:null },
+  marker: { x:0.5, y:0.55, frac:0.26, placed:false },
+  busy:false,
+};
+
+function readImage(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => resolve({ img, dataUrl: reader.result });
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+$("fileInterior").addEventListener("change", async (e)=>{
+  const f = e.target.files[0]; if(!f) return;
+  const { img, dataUrl } = await readImage(f);
+  state.interior = { img, natW:img.naturalWidth, natH:img.naturalHeight, dataUrl };
+  const tile = $("tileInterior");
+  tile.classList.add("has");
+  tile.querySelector(".ph")?.remove();
+  let thumb = tile.querySelector("img");
+  if(!thumb){ thumb = document.createElement("img"); tile.appendChild(thumb); }
+  thumb.src = dataUrl;
+  if(!tile.querySelector(".badge")){
+    const b=document.createElement("div"); b.className="badge"; b.textContent="Интерьер"; tile.appendChild(b);
+  }
+  $("stageImg").src = dataUrl;
+  $("stageCard").classList.add("show");
+  if(!state.marker.placed){ state.marker.x=0.5; state.marker.y=0.55; }
+  $("marker").style.display="block";
+  renderMarker();
+  updateGo();
+});
+
+$("fileComposition").addEventListener("change", async (e)=>{
+  const f = e.target.files[0]; if(!f) return;
+  const { img, dataUrl } = await readImage(f);
+  state.composition = { img, dataUrl };
+  const tile = $("tileComposition");
+  tile.classList.add("has");
+  tile.querySelector(".ph")?.remove();
+  let thumb = tile.querySelector("img");
+  if(!thumb){ thumb = document.createElement("img"); tile.appendChild(thumb); }
+  thumb.src = dataUrl;
+  if(!tile.querySelector(".badge")){
+    const b=document.createElement("div"); b.className="badge"; b.textContent="Композиция"; tile.appendChild(b);
+  }
+  updateGo();
+});
+
+const stage = $("stage");
+let dragging = false;
+
+function placeFromEvent(e){
+  const r = $("stageImg").getBoundingClientRect();
+  if(r.width===0) return;
+  let x = (e.clientX - r.left) / r.width;
+  let y = (e.clientY - r.top) / r.height;
+  state.marker.x = Math.min(1, Math.max(0, x));
+  state.marker.y = Math.min(1, Math.max(0, y));
+  state.marker.placed = true;
+  renderMarker();
+}
+function renderMarker(){
+  const m = $("marker");
+  const w = $("stageImg").clientWidth;
+  if(!w) return;
+  const d = state.marker.frac * w;
+  m.style.width = d+"px";
+  m.style.height = d+"px";
+  m.style.left = (state.marker.x*100)+"%";
+  m.style.top = (state.marker.y*100)+"%";
+}
+stage.addEventListener("pointerdown",(e)=>{ dragging=true; stage.setPointerCapture(e.pointerId); placeFromEvent(e); });
+stage.addEventListener("pointermove",(e)=>{ if(dragging) placeFromEvent(e); });
+stage.addEventListener("pointerup",()=>{ dragging=false; });
+stage.addEventListener("pointercancel",()=>{ dragging=false; });
+window.addEventListener("resize", renderMarker);
+$("size").addEventListener("input",(e)=>{ state.marker.frac = Number(e.target.value)/100; renderMarker(); });
+
+function updateGo(){
+  $("go").disabled = !(state.interior.img && state.composition.img) || state.busy;
+}
+
+function toBase64(img, maxDim, drawMarker){
+  const scale = Math.min(1, maxDim/Math.max(img.naturalWidth, img.naturalHeight));
+  const cw = Math.round(img.naturalWidth*scale);
+  const ch = Math.round(img.naturalHeight*scale);
+  const c = document.createElement("canvas");
+  c.width = cw; c.height = ch;
+  const ctx = c.getContext("2d");
+  ctx.drawImage(img,0,0,cw,ch);
+  if(drawMarker){
+    const cx = state.marker.x*cw, cy = state.marker.y*ch;
+    const rad = state.marker.frac*cw/2;
+    ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2);
+    ctx.fillStyle="rgba(255,45,166,0.20)"; ctx.fill();
+    ctx.lineWidth = Math.max(4, cw*0.007); ctx.strokeStyle="#ff2da6"; ctx.stroke();
+    const ch2 = rad*0.34;
+    ctx.lineWidth = Math.max(2, cw*0.004);
+    ctx.beginPath(); ctx.moveTo(cx-ch2,cy); ctx.lineTo(cx+ch2,cy);
+    ctx.moveTo(cx,cy-ch2); ctx.lineTo(cx,cy+ch2); ctx.stroke();
+  }
+  return c.toDataURL("image/jpeg",0.9).split(",")[1];
+}
+
+async function generate(){
+  if(state.busy) return;
+  state.busy = true; updateGo();
+  const out = $("result");
+  out.innerHTML = '<div class="loading"><div class="spinner"></div><div>Собираю композицию в интерьере… обычно 10–25 секунд.</div></div>';
+  out.scrollIntoView({behavior:"smooth", block:"start"});
+  try{
+    const interiorBase64 = toBase64(state.interior.img, 1600, true);
+    const compositionBase64 = toBase64(state.composition.img, 1280, false);
+    const res = await fetch("/api/generate",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({
+        interiorBase64, interiorMime:"image/jpeg",
+        compositionBase64, compositionMime:"image/jpeg",
+        preferences: $("prefs").value || "",
+      }),
+    });
+    const data = await res.json();
+    if(!res.ok){ throw new Error(data.error || "Ошибка генерации"); }
+    out.innerHTML =
+      '<div class="result-card">' +
+        '<img src="'+data.image+'" alt="результат" />' +
+        '<div class="result-actions">' +
+          '<a class="btn-ghost" href="'+data.image+'" download="moss-cvety-v-interere.png">Скачать</a>' +
+          '<button class="btn-ghost" id="again">Сгенерировать заново</button>' +
+        '</div>' +
+      '</div>';
+    $("again").addEventListener("click", generate);
+    refreshBalance();
+  }catch(err){
+    const isNet = (err && (err.name === "TypeError" || /fetch/i.test(err.message||"")));
+    const text = isNet ? "Нет связи с сервером. Проверьте интернет и попробуйте снова." : (err.message || "Ошибка генерации");
+    out.innerHTML = '<div class="err">'+text+'</div>';
+  }finally{
+    state.busy = false; updateGo();
+  }
+}
+$("go").addEventListener("click", generate);
+
+// --- Остаток баланса OpenRouter ---
+function fmtMoney(v){ return "$" + (Math.round(v*100)/100).toFixed(2); }
+async function refreshBalance(){
+  const el = $("balance"), txt = $("balanceText");
+  try{
+    const r = await fetch("/api/balance");
+    const d = await r.json();
+    if(!d.available || d.remaining == null){
+      if(d.available && d.usage != null){
+        el.hidden = false; el.className = "balance";
+        txt.textContent = "Потрачено: " + fmtMoney(d.usage) + " · задайте лимит на ключе, чтобы видеть остаток";
+      } else { el.hidden = true; }
+      return;
+    }
+    el.hidden = false;
+    const gen = d.estGen;
+    let label = "Остаток: " + fmtMoney(d.remaining);
+    if(gen != null) label += " · ≈ " + gen + " " + plural(gen, "генерация","генерации","генераций");
+    txt.textContent = label;
+    el.className = "balance" + (d.remaining <= 0 ? " empty" : (gen != null && gen <= 5 ? " low" : ""));
+  }catch{ el.hidden = true; }
+}
+function plural(n, one, few, many){
+  const m10 = n % 10, m100 = n % 100;
+  if(m10 === 1 && m100 !== 11) return one;
+  if(m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few;
+  return many;
+}
+refreshBalance();
+</script>
+</body>
+</html>
