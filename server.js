@@ -36,8 +36,19 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true, keyConfigured: Boolean(API_KEY), model: MODEL });
 });
 
+// Проверка пароля доступа (для экрана входа)
+app.get("/api/check", (req, res) => {
+  if (ACCESS_PASSWORD && req.get("x-access-password") !== ACCESS_PASSWORD) {
+    return res.status(401).json({ ok: false });
+  }
+  res.json({ ok: true, protected: Boolean(ACCESS_PASSWORD) });
+});
+
 // Остаток баланса/лимита по ключу
-app.get("/api/balance", async (_req, res) => {
+app.get("/api/balance", async (req, res) => {
+  if (ACCESS_PASSWORD && req.get("x-access-password") !== ACCESS_PASSWORD) {
+    return res.status(401).json({ available: false, reason: "auth" });
+  }
   if (!API_KEY) return res.json({ available: false, reason: "no_key" });
   try {
     let usage = null, limit = null, remaining = null;
